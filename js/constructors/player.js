@@ -17,7 +17,7 @@ window.addEventListener(
 );
 
 const Player = function(game, playerCss) {
-    this.game = game;
+  this.game = game;
   this.playerCss = playerCss;
   this.xPosition = 0;
   this.yPosition = 0;
@@ -29,20 +29,59 @@ const Player = function(game, playerCss) {
   this.placedBombs = [];
 
   this.movement = function(key) {
+    let yPosition = this.yPosition;
+    let xPosition = this.xPosition;
+    console.log(this.game.bombs);
     if (key === "W") {
       this.yPosition -= 20;
+      this.game.bombs.forEach(el => {
+        el.yPos.forEach((element, index) => {
+          if (yPosition === element && xPosition === el.xPos[index]) {
+            this.yPosition = 0;
+            this.xPosition = 0;
+            $("#" + this.playerCss).css("left", this.xPosition + "px");
+          }
+        });
+      });
       if (this.yPosition < 0) return (this.yPosition += 20);
       $("#" + this.playerCss).css("top", this.yPosition + "px");
     } else if (key === "S") {
       this.yPosition += 20;
+      this.game.bombs.forEach(el => {
+        el.yPos.forEach((element, index) => {
+          if (yPosition === element && xPosition === el.xPos[index]) {
+            this.yPosition = 0;
+            this.xPosition = 0;
+            $("#" + this.playerCss).css("left", this.xPosition + "px");
+          }
+        });
+      });
       if (this.yPosition >= 580) return (this.yPosition -= 20);
       $("#" + this.playerCss).css("top", this.yPosition + "px");
     } else if (key === "A") {
       this.xPosition -= 20;
+      this.game.bombs.forEach(el => {
+        el.xPos.forEach((element, index) => {
+          if (xPosition === element && yPosition === el.yPos[index]) {
+            this.yPosition = 0;
+            this.xPosition = 0;
+            $("#" + this.playerCss).css("top", this.yPosition + "px");
+          }
+        });
+      });
       if (this.xPosition < 0) return (this.xPosition += 20);
       $("#" + this.playerCss).css("left", this.xPosition + "px");
     } else if (key === "D") {
       this.xPosition += 20;
+      this.game.bombs.forEach(el => {
+        el.xPos.forEach((element, index) => {
+          if (xPosition === element && yPosition === el.yPos[index]) {
+            this.yPosition = 0;
+            this.xPosition = 0;
+            $("#" + this.playerCss).css("top", this.yPosition + "px");
+          }
+        });
+      });
       if (this.xPosition >= 1100) return (this.xPosition -= 20);
       $("#" + this.playerCss).css("left", this.xPosition + "px");
     }
@@ -104,45 +143,56 @@ const Player = function(game, playerCss) {
 
     setTimeout(
       function() {
-        // let xStr = str;
-        // yPos -= str / 2;
-        // if (yPos < 0) {
-        //   str += yPos;
-        //   yPos = 0;
-        // }
-        // if (yPos + str >= 580) {
-        //   str -= (yPos + str) % 560;
-        // }
-        // str += 20;
-        // xPos -= xStr / 2;
-        // if (xPos < 0) {
-        //   xStr += xPos;
-        //   xPos = 0;
-        // }
-        // if (xPos + xStr > 1100) {
-        //   xStr -= (xPos + xStr)%1080;
-        // }
-        // xStr += 20;
-        // $("#" + this.playerCss + id).css({
-        //   "background-color": "yellow",
-        //   height: str + "px",
-        //   top: yPos + "px"
-        // });
-        // $("#" + id + this.playerCss).css({
-        //   "background-color": "yellow",
-        //   width: xStr + "px",
-        //   left: xPos + "px"
-        // });
-        // setTimeout(
-        //   function() {
-        //     $("#" + this.playerCss + id).remove();
-        //     $("#" + id + this.playerCss).remove();
-        //     this.placedBombs = this.placedBombs.filter(el => {
-        //       return el.id !== id;
-        //     });
-        //   }.bind(this),
-        //   1000
-        // );
+        let xStr = str;
+        let oriStr = str;
+        yPos -= str / 2;
+        if (yPos < 0) {
+          str += yPos;
+          yPos = 0;
+        }
+        if (yPos + str >= 580) {
+          str -= (yPos + str) % 560;
+        }
+        str += 20;
+        xPos -= xStr / 2;
+        if (xPos < 0) {
+          xStr += xPos;
+          xPos = 0;
+        }
+        if (xPos + xStr >= 1100) {
+          xStr -= (xPos + xStr) % 1080;
+        }
+        xStr += 20;
+
+        $("#" + this.playerCss + id).css({
+          "background-color": "yellow",
+          height: str + "px",
+          top: yPos + "px"
+        });
+        $("#" + id + this.playerCss).css({
+          "background-color": "yellow",
+          width: xStr + "px",
+          left: xPos + "px"
+        });
+
+        this.game.bombs.push({ xPos: [], yPos: [], id: id });
+        let gameBombsLength = this.game.bombs.length - 1;
+        for (var i = 0; i < oriStr / 20; i++) {
+          this.game.bombs[gameBombsLength].xPos.push(xPos);
+          this.game.bombs[gameBombsLength].yPos.push(yPos);
+          xPos += 20;
+          yPos += 20;
+        }
+
+        setTimeout(
+          function() {
+            $("#" + this.playerCss + id).remove();
+            $("#" + id + this.playerCss).remove();
+            this.placedBombs = this.placedBombs.filter(el => el.id !== id);
+            this.game.bombs = this.game.bombs.filter(el => el.id !== id);
+          }.bind(this),
+          1000
+        );
       }.bind(this),
       2000
     );
