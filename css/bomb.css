@@ -1,0 +1,6 @@
+.bomb {
+    height: 20px;
+    width: 20px;
+    background-color: rgb(61, 61, 61);
+    position: absolute;
+}
